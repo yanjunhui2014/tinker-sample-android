@@ -425,6 +425,8 @@ if (buildWithTinker()) {
                         if (variant.metaClass.hasProperty(variant, 'packageApplicationProvider')) {
                             def packageAndroidArtifact = variant.packageApplicationProvider.get()
                             if (packageAndroidArtifact != null) {
+                                //variant.outputs.first().apkData.outputFileName - gradle 2.x 3.x
+                                //variant.outputs.first().variantOutput.outputFileName.get() - gradle 4.x
                                 try {
                                     from new File(packageAndroidArtifact.outputDirectory.getAsFile().get(), variant.outputs.first().apkData.outputFileName)
                                 } catch (Exception e) {
