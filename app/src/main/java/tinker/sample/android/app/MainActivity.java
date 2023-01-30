@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         loadPatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String patch7ZipPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk";
+                String patch7ZipPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/1test/patch_signed_7zip.apk";
                 Log.d(TAG, "patch7ZipPath:" + patch7ZipPath);
                 TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), patch7ZipPath);
             }
