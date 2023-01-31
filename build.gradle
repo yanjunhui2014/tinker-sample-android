@@ -4,6 +4,8 @@ buildscript {
         mavenLocal()
         jcenter()
         google()
+        maven { url NEXUS_REPOSITORY_URL }
+        maven { url NEXUS_SNAPSHOT_REPOSITORY_URL }
     }
     dependencies {
 //        if (project.hasProperty('GRADLE_3') && GRADLE_3.equalsIgnoreCase('TRUE')) {
@@ -28,6 +30,9 @@ allprojects {
         mavenLocal()
         jcenter()
         google()
+        maven { url NEXUS_REPOSITORY_URL }
+        maven { url NEXUS_SNAPSHOT_REPOSITORY_URL }
+        maven { url 'https://jitpack.io' }
     }
 }
 

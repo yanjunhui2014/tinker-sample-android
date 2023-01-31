@@ -19,11 +19,13 @@ package tinker.sample.android.app;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -31,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -40,7 +43,15 @@ import com.tencent.tinker.lib.library.TinkerLoadLibrary;
 import com.tencent.tinker.lib.tinker.Tinker;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
 import com.tencent.tinker.loader.shareutil.ShareConstants;
+import com.tencent.tinker.loader.shareutil.SharePatchFileUtil;
+import com.tencent.tinker.loader.shareutil.ShareReflectUtil;
 import com.tencent.tinker.loader.shareutil.ShareTinkerInternals;
+import com.tencent.tinker.loader.shareutil.ShareTinkerLog;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import tinker.sample.android.R;
 import tinker.sample.android.util.Utils;
@@ -62,13 +73,11 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e(TAG, "i am on patch onCreate");
 
         mTvMessage = findViewById(R.id.tv_message);
+        ((TextView) findViewById(R.id.textView)).setText("patch load suc");
 
         askForRequiredPermissions();
 
         Button loadPatchButton = (Button) findViewById(R.id.loadPatch);
-
-        ((TextView)findViewById(R.id.textView)).setText("patch load suc");
-
         loadPatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,8 +87,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button loadLibraryButton = (Button) findViewById(R.id.loadLibrary);
+        Button movePatchButton = (Button) findViewById(R.id.movePatch);
+        movePatchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File patch7ZipFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/1test/patch_signed_7zip.apk");
+                if (SharePatchFileUtil.isLegalFile(patch7ZipFile)) {
+                    File dest = new File(getExternalCacheDir().getAbsolutePath() + "/patch_signed_7zip.apk");
+                    try {
+                        Log.d(TAG, "文件将要拷贝至：" + dest.getAbsolutePath());
+                        SharePatchFileUtil.copyFileUsingStream(patch7ZipFile, dest);
+                        Log.d(TAG, "文件拷贝成功");
+                    } catch (IOException e) {
+                        Log.e(TAG, "文件拷贝时发生io异常");
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "补丁文件不存在", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
+        Button loadLibraryButton = (Button) findViewById(R.id.loadLibrary);
         loadLibraryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,6 +172,14 @@ public class MainActivity extends AppCompatActivity {
             final int res = ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             return res == PackageManager.PERMISSION_GRANTED;
         }
+
+//        if (Build.VERSION.SDK_INT >= 30) {
+//            if (!Environment.isExternalStorageManager()) {
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+//                startActivity(intent);
+//                return true;
+//            }
+//        }
     }
 
     public boolean showInfo(Context context) {
